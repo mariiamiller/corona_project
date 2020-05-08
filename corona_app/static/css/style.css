@@ -1,0 +1,16 @@
+* { box-sizing: border-box; }
+body {
+  font: 16px Arial;
+}
+h2 {
+  color: darkgreen;
+}
+
+.line {
+  fill: none;
+  stroke-width: 2px;
+  clip-path: url(#clip);
+}
+#selDataset { 
+  width:150px; }
+
