@@ -64,7 +64,9 @@ function init() {
   });
 }
 
-function optionChanged(newSample) {
+function optionChanged(selector) {
+  /// figure out how to get the items from the selector...
+  /// not very hard
 
   buildMetadata(newSample);
 
