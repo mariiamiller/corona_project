@@ -24,14 +24,15 @@ app = Flask(__name__)
 #################################################
 
 
-engine = create_engine("sqlite:///db/corona_new.db")
+#engine = create_engine("sqlite:///db/corona_new.db")
+engine = create_engine("sqlite:///db/corona0510.db")
 
 Base = automap_base()
 
 Base.prepare(engine, reflect=True)
 
-country_date = Base.classes.country_date
-lockdown = Base.classes.lockdown
+country_date = Base.classes.population0510
+lockdown = Base.classes.lockdown0510
 
 
 @app.route("/")
@@ -63,7 +64,7 @@ def countries_func(country):
     """Return country info."""
 
     session = Session(engine)
-    results = session.query( lockdown.country, lockdown.population, lockdown.density,lockdown.med_age, lockdown.lockdown_date, lockdown.lockdown_type, lockdown.Reference).\
+    results = session.query( lockdown.country, lockdown.population, lockdown.density_pkm2,lockdown.med_age, lockdown.lockdown_date, lockdown.lockdown_type, lockdown.reference).\
     filter(lockdown.country == country).all()
     #session.close()
     
@@ -88,7 +89,7 @@ def new_cases(country):
 def new_cases_all():
 
     session = Session(engine)
-    results = session.query( country_date.country, country_date.date, country_date.new_cases).all()
+    results = session.query( country_date.country, country_date.date, country_date.new_cases,country_date.new_cases_perc, country_date.days_death, country_date.days_lock).all()
     print(results)
 
     return jsonify(results)
