@@ -28,30 +28,15 @@ function buildMetadata(countries) {
   
 
 
-    // Use d3 to select the panel with id of `#sample-metadata`
-// var sampleMetadata = d3.select("#sample-metadata")
-// // Use `.html("") to clear any existing metadata
-// sampleMetadata.selectAll("h2").remove();
-// sampleMetadata.selectAll("p").remove();
-// sampleMetadata.selectAll("a").remove();
-
-//d3.select("#sample-metadata").select(".well");
 var selecteddiv = d3.selectAll("#sample-metadata").append("div")
  .classed("well", true);
-// d3.select("#sample-metadata").select(".well").append("h2").text(data[0]);
-// d3.select("#sample-metadata").append("p").text(data[1]);
-// d3.select("#sample-metadata").append("p").text(data[2]);
-// d3.select("#sample-metadata").append("p").text(data[3]);
-// d3.select("#sample-metadata").append("p").text(data[4]);
-// d3.select("#sample-metadata").append("p").text(data[5]);
-// d3.select("#sample-metadata").append("a").text("more info").attr("href",data[6]);
 selecteddiv.append("h2").text(data[0]);
-selecteddiv.append("p").text(data[1]);
-selecteddiv.append("p").text(data[2]);
-selecteddiv.append("p").text(data[3]);
-selecteddiv.append("p").text(data[4]);
-selecteddiv.append("p").text(data[5]);
-selecteddiv.append("a").text("more info").attr("href",data[6]);
+selecteddiv.append("p").text("Population: "+data[1]);
+selecteddiv.append("p").text("Density (P/km^2): "+data[2]);
+selecteddiv.append("p").text("Median Age: "+data[3]);
+selecteddiv.append("p").text(data[5]+" lockdown "+data[4]).attr("href",data[6]);
+// selecteddiv.append("p").text(data[5]);
+// selecteddiv.append("a").text("more info").attr("href",data[6]);
 
   });
 }
@@ -108,18 +93,18 @@ function buildChart(countries) {
 console.log(countries);
  d3.select("#bubble").selectAll("svg").remove();
   
- var margin = {top: 10, right: 30, bottom: 30, left: 60},
- width = 600 - margin.left - margin.right,
- height = 400 - margin.top - margin.bottom;
+ var margin = {top: 20, right: 40, bottom: 80, left: 100},
+ width = 800 - margin.left - margin.right,
+ height = 500 - margin.top - margin.bottom;
 
 // append the svg object to the body of the page
 var svg = d3.select("#bubble")
 .append("svg")
  .attr("width", width + margin.left + margin.right)
- .attr("height", height + margin.top + margin.bottom)
-.append("g")
- .attr("transform",
-       "translate(" + margin.left + "," + margin.top + ")");
+ .attr("height", height + margin.top + margin.bottom);
+// .append("g")
+//  .attr("transform",
+//        "translate(" + margin.left + "," + margin.top + ")");
 
 //Read the data
 url = "new_cases_all"
@@ -130,50 +115,196 @@ function filterCountries(d) {     if( countries.includes(d.country)){
 
 }
 }
+
+var chosenXAxis = "days_death";
+var chosenYAxis = "new_cases_perc";
+
+// function used for updating x-scale var upon click on axis label
+function xScale(healthData, chosenXAxis) {
+
+  if (chosenXAxis === "date") {
+
+
+  // create scales
+
+ //d3.scaleTime().range([0, width])
+  var xLinearScale = d3.scaleTime()
+    .domain([d3.min(healthData, d => d[chosenXAxis]),
+      d3.max(healthData, d => d[chosenXAxis])
+    ])
+    .range([0, width]);
+
+  return xLinearScale;
+  }
+
+  else {
+      // create scales
+  var xLinearScale = d3.scaleLinear()
+  .domain([d3.min(healthData, d => d[chosenXAxis]) * 0.8,
+    d3.max(healthData, d => d[chosenXAxis]) * 1.2
+  ])
+  .range([0, width]);
+
+return xLinearScale;
+  }
+}
+
+// function used for updating xAxis var upon click on axis label
+function renderAxes(newXScale, xAxis) {
+  var bottomAxis = d3.axisBottom(newXScale);
+
+  xAxis.transition()
+    .duration(1000)
+    .call(bottomAxis);
+
+  return xAxis;
+}
+
+
+  // function used for updating line group with a transition to
+// new lines
+
+//OLD RENDER
+
+// function renderLines(linesGroup, newXScale, chosenXaxis) {
+
+//   linesGroup.transition()
+//     .duration(1000)
+//     .attr("x", d => newXScale(d[chosenXAxis]));
+
+//   return linesGroup;
+// }
+
+// function used for updating y-scale var upon click on axis label
+function yScale(healthData, chosenYAxis) {
+  // create scales
+  var yLinearScale = d3.scaleLinear()
+    .domain([d3.min(healthData, d => d[chosenYAxis]) * 0.8,
+      d3.max(healthData, d => d[chosenYAxis]) * 1.2
+    ])
+    .range([height, 0]);
+
+  return yLinearScale;
+
+}
+
+function renderYAxes(newYScale, yAxis) {
+  var leftAxis = d3.axisLeft(newYScale);
+
+  yAxis.transition()
+    .duration(1000)
+    .call(leftAxis);
+
+  return yAxis;
+}
+
+// 
+
+// function renderYLines(linesGroup, newYScale, chosenYaxis) {
+
+//   linesGroup
+//      .data(sumstat)
+//      .enter()
+//      .append("path")
+//        .attr("fill", "none")
+//        .attr("stroke", function(d){ return color(d.key) })
+//        .attr("stroke-width", 1.5)
+//        .attr("d", function(d){
+//          console.log(d[chosenXAxis]);
+//          return d3.line()
+//            .x(function(d) { return xLinearScale(d[chosenXAxis]); })
+//            .y(function(d) { return newYScale(d[chosenYAxis]); })
+//            (d.values)
+//       //      .attr("fill", "none")
+//       //  .attr("stroke", function(d){ return color(d.key) })
+//       //  .attr("stroke-width", 1.5)
+//        })
+
+//   return linesGroup;
+// }
+
+
+
+
+
 d3.json(url).then(function(data) {
+
+
+
+//   function renderYLines(linesGroup, newYScale, chosenYaxis) {
+
+//    // console.log(linesGroup);
+
+//     linesGroup.transition()
+//     .duration(1000)
+//     .attr("d", function(d){
+//       //console.log(d[chosenXAxis]);
+//       return d3.line()
+//         .x(function(d) { return xLinearScale(d[chosenXAxis]); })
+//         .y(function(d) { return newYScale(d[chosenYAxis]); })
+//         (d.values)
+//    //      .attr("fill", "none")
+//    //  .attr("stroke", function(d){ return color(d.key) })
+//    //  .attr("stroke-width", 1.5)
+//     })
+
+
+//   return linesGroup;
+// }
+
 
   data.forEach(function(d) {
     d.date = parseTime(d.date);
     d.new_cases_perc = +d.new_cases_perc;
+    d.new_cases = +d.new_cases;
+    d.days_death = +d.days_death;
+    d.days_lock = +d.days_lock;
     countries.includes(d.country);
 
 });
 
 console.log(data.filter(d=>d.country =='US'));
 data = data.filter(d=>countries.includes(d.country));
-// function getCountries(c) {
-//   return countries.includes(c.country);
-// }
-// data.filter(getCountries);
 
+var xLinearScale = xScale(data, chosenXAxis);
+var yLinearScale = yScale(data, chosenYAxis);
+var bottomAxis = d3.axisBottom(xLinearScale);
+var leftAxis = d3.axisLeft(yLinearScale);
 
-// if( countries.includes(d.country)){
-//   console.log(d);
+var chartGroup = svg.append("g")
+  .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+var xAxis = chartGroup.append("g")
+.classed("x-axis", true)
+.attr("transform", `translate(0, ${height})`)
+.call(bottomAxis);
+
+var yAxis = chartGroup.append("g")
+
+.classed("y-axis", true)
+    //.attr("transform", `translate(0, ${width})`)
+    .call(leftAxis);
+    
+
 
 // }
 console.log(data);
+
+
+//THIS WORKS
+
 
 // group the data: I want to draw one line per group
 var sumstat = d3.nest() // nest function allows to group the calculation per level of a factor
  .key(function(d) { return d.country;})
  .entries(data);
 
+ // group the data: I want to draw one line per group
+// var sumstat = d3.nest() // nest function allows to group the calculation per level of a factor
+// .key(function(d) { return d.country+ " " + d.new_cases+" "+d.new_cases_all; })
+// .entries(data);
 
 
-// Add X axis --> it is a date format
-var x = d3.scaleTime()
- .domain(d3.extent(data, function(d) { return d.date; }))
- .range([ 0, width ]);
-svg.append("g")
- .attr("transform", "translate(0," + height + ")")
- .call(d3.axisBottom(x).ticks(12));
-
-// Add Y axis
-var y = d3.scaleLinear()
- .domain([0, d3.max(data, function(d) { return +d.new_cases_perc; })])
- .range([ height, 0 ]);
-svg.append("g")
- .call(d3.axisLeft(y));
 
 // color palette
 var res = sumstat.map(function(d){ return d.key }) // list of group names
@@ -181,8 +312,84 @@ var color = d3.scaleOrdinal()
  .domain(res)
  .range(['#e41a1c','#377eb8','#4daf4a','#984ea3','#ff7f00','#ffff33','#a65628','#f781bf','#999999'])
 
+
+ var legend = svg.selectAll('.line')
+ .data(sumstat)
+ .enter()
+ .append('g')
+ .attr('class', 'legend');
+
+legend.append('rect')
+ .attr('x', width - 50)
+ .attr('y', function(d, i) {
+   return i * 20+10;
+ })
+ .attr('width', 15)
+ .attr('height', 15)
+ .style('fill', function(d) {
+   return color(d.key);
+ })
+
+legend.append('text')
+ .attr('x', width - 10)
+ .attr('y', function(d, i) {
+   return (i * 20) + 21;
+ })
+ .text(function(d) {
+   return d.key;
+ });
+
+function renderLines(linesGroup, newXScale, chosenXaxis) {
+  console.log(chosenXAxis);
+    linesGroup
+  
+       .transition()
+       .duration(1000)
+         .attr("d", function(d){
+  
+           return d3.line()
+             .x(function(d) { return newXScale(d[chosenXAxis]); })
+             .y(function(d) { return yLinearScale(d[chosenYAxis]); })
+             (d.values)
+        //      .attr("fill", "none")
+        //  .attr("stroke", function(d){ return color(d.key) })
+        //  .attr("stroke-width", 1.5)
+         })
+  
+  
+         return linesGroup
+  
+        }
+
+
+
+
+
+
+function renderYLines(linesGroup, newYScale, chosenYaxis) {
+console.log(chosenYAxis);
+  linesGroup
+
+     .transition()
+     .duration(1000)
+       .attr("d", function(d){
+
+         return d3.line()
+           .x(function(d) { return xLinearScale(d[chosenXAxis]); })
+           .y(function(d) { return newYScale(d[chosenYAxis]); })
+           (d.values)
+      //      .attr("fill", "none")
+      //  .attr("stroke", function(d){ return color(d.key) })
+      //  .attr("stroke-width", 1.5)
+       })
+
+
+       return linesGroup
+
+      }
 // Draw the line
-svg.selectAll(".line")
+var linesGroup = 
+chartGroup.selectAll(".line")
    .data(sumstat)
    .enter()
    .append("path")
@@ -190,13 +397,188 @@ svg.selectAll(".line")
      .attr("stroke", function(d){ return color(d.key) })
      .attr("stroke-width", 1.5)
      .attr("d", function(d){
+
        return d3.line()
-         .x(function(d) { return x(d.date); })
-         .y(function(d) { return y(d.new_cases_perc); })
+         .x(function(d) { return xLinearScale(d[chosenXAxis]); })
+         .y(function(d) { return yLinearScale(d[chosenYAxis]); })
          (d.values)
+    //      .attr("fill", "none")
+    //  .attr("stroke", function(d){ return color(d.key) })
+    //  .attr("stroke-width", 1.5)
      })
 
+    // Create group for  2 x- axis labels
+    var labelsGroup = chartGroup.append("g")
+      .attr("transform", `translate(${width /2}, ${height + 20})`);
+  
+    var dateLabel = labelsGroup.append("text")
+      .attr("x", 0)
+      .attr("y", 20)
+      .attr("value", "date") // value to grab for event listener
+      .classed("active", true)
+      .text("Date");
+  
+    var deathLabel = labelsGroup.append("text")
+      .attr("x", 0)
+      .attr("y", 40)
+      .attr("value", "days_death") // value to grab for event listener
+      .classed("inactive", true)
+      .text("Death");
+
+
+    var lockLabel = labelsGroup.append("text")
+      .attr("x", 0)
+      .attr("y", 60)
+      .attr("value", "days_lock") // value to grab for event listener
+      .classed("inactive", true)
+      .text("Lock");
+
+
+// Create group for  2 y- axis labels
+var labelsGroupY = chartGroup.append("g")
+// .attr("transform", `translate(${width /2}, ${height + 20})`);
+.attr("transform", "rotate(-90)")
+
+
+var new_casesLabel = labelsGroupY.append("text")
+//.attr("y", 0 - margin.left)?????????????????
+.attr("y",0-40)
+.attr("dy", "1em")
+
+.attr("x", 0 - (height / 2))
+.attr("value", "new_cases") // value to grab for event listener
+.classed("active", true)
+.text("New Cases Total");
+
+var new_cases_percLabel = labelsGroupY.append("text")
+//.attr("y", 0 - margin.left)
+.attr("y",0-60)
+.attr("dy", "1em")
+.attr("x", 0 - (height / 2))
+.attr("value", "new_cases_perc") // value to grab for event listener
+.classed("inactive", true)
+.text("New cases Per Capita");
+
+
+labelsGroup.selectAll("text")
+      .on("click", function() {
+        // get value of selection
+        var value = d3.select(this).attr("value");
+        if (value !== chosenXAxis) {
+  
+          // replaces chosenXAxis with value
+          chosenXAxis = value;
+  
+          console.log(chosenXAxis)
+  
+          // functions here found above csv import
+          // updates x scale for new data
+          xLinearScale = xScale(data, chosenXAxis);
+  
+          // updates x axis with transition
+          xAxis = renderAxes(xLinearScale, xAxis);
+  
+          // updates circles with new x values
+          linesGroup = renderLines(linesGroup, xLinearScale, chosenXAxis);
+          //circlesText = renderText(circlesText, xLinearScale, chosenXAxis);
+          // // updates tooltips with new info
+          // circlesGroup = updateToolTip(chosenXAxis, circlesGroup);
+  
+          // changes classes to change bold text
+          if (chosenXAxis === "date") {
+            dateLabel
+              .classed("active", true)
+              .classed("inactive", false);
+            deathLabel
+              .classed("active", false)
+              .classed("inactive", true);
+            lockLabel
+              .classed("active", false)
+              .classed("inactive", true);
+
+          }
+          else if (chosenXAxis === "days_death") {
+            dateLabel
+            .classed("active", false)
+            .classed("inactive", true);
+          deathLabel
+            .classed("active", true)
+            .classed("inactive", false);
+          lockLabel
+            .classed("active", false)
+            .classed("inactive", true);
+          }
+          else {
+            dateLabel
+            .classed("active", false)
+            .classed("inactive", true);
+          deathLabel
+            .classed("active", false)
+            .classed("inactive", true);
+          lockLabel
+            .classed("active", true)
+            .classed("inactive", false); 
+
+          }
+        }
+      });
+
+      labelsGroupY.selectAll("text")
+      .on("click", function() {
+        // get value of selection
+        var value = d3.select(this).attr("value");
+        if (value !== chosenYAxis) {
+  
+          // replaces chosenXAxis with value
+          chosenYAxis = value;
+  
+          console.log(chosenYAxis)
+  
+          // functions here found above csv import
+          // updates x scale for new data
+          yLinearScale = yScale(data, chosenYAxis);
+  
+          // updates x axis with transition
+          yAxis = renderYAxes(yLinearScale, yAxis);
+  
+          // updates circles with new x values
+          linesGroup = renderYLines(linesGroup, yLinearScale, chosenYAxis);
+          //circlesText = renderYText(circlesText, yLinearScale, chosenYAxis);
+          // // updates tooltips with new info
+          // linesGroup = updateToolTipY(chosenYAxis, linesGroup);
+  
+          // changes classes to change bold text
+          if (chosenYAxis === "new_cases") {
+            new_casesLabel
+              .classed("active", true)
+              .classed("inactive", false);
+            new_cases_percLabel
+              .classed("active", false)
+              .classed("inactive", true);
+
+  
+          }
+
+          else {
+            new_casesLabel
+            .classed("active", false)
+            .classed("inactive", true);
+
+          new_cases_percLabel
+            .classed("active", true)
+            .classed("inactive", false); 
+  
+          }
+        }
+      });
+
+
+
+
 })
+
+
+
 
 
   // var svgWidth = 960;
