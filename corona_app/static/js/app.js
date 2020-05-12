@@ -428,7 +428,7 @@ chartGroup.selectAll(".line")
       .text("Date");
   
     var deathLabel = labelsGroup.append("text")
-      .attr("x", 0-55)
+      .attr("x", 0)
       .attr("y", 40)
       .attr("value", "days_death") // value to grab for event listener
       .classed("inactive", true)
@@ -436,7 +436,7 @@ chartGroup.selectAll(".line")
 
 
     var lockLabel = labelsGroup.append("text")
-      .attr("x", 0-53)
+      .attr("x", 0)
       .attr("y", 60)
       .attr("value", "days_lock") // value to grab for event listener
       .classed("inactive", true)
@@ -454,7 +454,7 @@ var new_casesLabel = labelsGroupY.append("text")
 .attr("y",0-60)
 .attr("dy", "1em")
 
-.attr("x", 0 - (height / 2)-25)
+.attr("x", 0 - (height / 2))
 .attr("value", "new_cases") // value to grab for event listener
 .classed("active", true)
 .text("New cases");
@@ -463,7 +463,7 @@ var new_cases_percLabel = labelsGroupY.append("text")
 //.attr("y", 0 - margin.left)
 .attr("y",0-90)
 .attr("dy", "1em")
-.attr("x", 0 - (height / 2)-68)
+.attr("x", 0 - (height / 2))
 .attr("value", "new_cases_perc") // value to grab for event listener
 .classed("inactive", true)
 .text("New cases per capita");
@@ -586,103 +586,6 @@ labelsGroup.selectAll("text")
 
 })
 
-
-
-
-
-  // var svgWidth = 960;
-  // var svgHeight = 540;
-  
-  // var margin = {
-  //   top: 20,
-  //   right: 40,
-  //   bottom: 80,
-  //   left: 100
-  // };
-  // var width = svgWidth - margin.left - margin.right;
-  // var height = svgHeight - margin.top - margin.bottom;
-  // // url1 = "/new_cases/"+country;
-  // // url2 = "/countries/"+country;
-  // url = "new_cases_all"
-  
-  // // parse the date / time
-  // var parseTime = d3.timeParse("%m/%d/%y");
-  
-  // // set the ranges
-  // var x = d3.scaleTime().range([0, width]);
-  // var y = d3.scaleLinear().range([height, 0]);
-  
-  
-  // // define the line
-  // var valueline = d3.line()
-  //     .x(function(d) { return x(d.date); })
-  //     .y(function(d) { return y(d.new_cases); });
-  
-  
-  
-  //     var svg = d3
-  //   .select("#bubble")
-  //   .append("svg")
-  //   .attr("width", svgWidth)
-  //   .attr("height", svgHeight);
-  // console.log('before graph');
-  // // Append an SVG group
-  // //var g = 
-  // // svg.append("g")
-  // //   .attr("transform", `translate(${margin.left}, ${margin.top})`);
-  
-  // //d3.json(url2).then(function(data2) {
-  //   d3.json(url).then(function(data) {
-  
-  //     data.forEach(function(d) {
-  //       d.date = parseTime(d.date);
-  //       d.new_cases = +d.new_cases;
-  //       if( countries.includes(d.country)){
-  //         console.log(d);
-  //       }
-  //   });
-
-  //   var valueline = d3.line()
-  //   .x(function(d) { return x(d.date); })
-  //   .y(function(d) { return y(d.new_cases); });
-  
-  
-  
-  //    // Scale the range of the data
-  //    x.domain(d3.extent(data, function(d) { return d.date; }));
-  //    y.domain([0, d3.max(data, function(d) { return d.new_cases; })]);
-   
-  //    // Add the valueline path.
-  //    svg.append("path")
-  //        .data([data])
-  //        .attr("class", "line")
-  //        .attr("d", valueline);
-   
-  //    // Add the X Axis
-  //    svg.append("g")
-  //        .attr("transform", "translate(0," + height + ")")
-  //        .call(d3.axisBottom(x));
-   
-  //    // Add the Y Axis
-  //    svg.append("g")
-  //        .call(d3.axisLeft(y).ticks(7));
-  
-  
-  
-  // });
-
-
-
-
-
-
-
-    // function type(d) {
-    //   d.date = parseDate(d.date);
-    // //  d.price = +d.price;
-    //   return d;
-    // }   
-  
   
   }
   
