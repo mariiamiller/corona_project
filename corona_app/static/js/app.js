@@ -22,22 +22,81 @@ function buildMetadata(countries) {
   
   var data = []
 
+
+  function nFormatter(num, digits) {
+    var si = [
+      { value: 1, symbol: "" },
+      { value: 1E3, symbol: "k" },
+      { value: 1E6, symbol: "M" },
+      { value: 1E9, symbol: "G" },
+      { value: 1E12, symbol: "T" },
+      { value: 1E15, symbol: "P" },
+      { value: 1E18, symbol: "E" }
+    ];
+    var rx = /\.0+$|(\.[0-9]*[1-9])0+$/;
+    var i;
+    for (i = si.length - 1; i > 0; i--) {
+      if (num >= si[i].value) {
+        break;
+      }
+    }
+    return (num / si[i].value).toFixed(digits).replace(rx, "$1") + si[i].symbol;
+  }
+
    d3.json(url).then(function(data) { 
 
   console.log(data);
-  
+  var selecteddiv = d3.selectAll("#sample-metadata").append("div")  
+if (data[5]==='Full'){
 
-
-var selecteddiv = d3.selectAll("#sample-metadata").append("div")
- .classed("well", true);
-selecteddiv.append("h2").text(data[0]);
-selecteddiv.append("p").text("Population: "+data[1]);
-selecteddiv.append("p").text("Density (P/km^2): "+data[2]);
-selecteddiv.append("p").text("Median Age: "+data[3]);
-selecteddiv.append("p").text(data[5]+" lockdown "+data[4]).attr("href",data[6]);
+selecteddiv
+ .classed("well", true).style("border-color", "red");
+selecteddiv.append("h3").text(data[0].toUpperCase());
+selecteddiv.append("p").text("Population:   "+nFormatter(data[1], 1));
+selecteddiv.append("p").text("Density (p/km"+'\xB2): '+data[2]);
+selecteddiv.append("p").text("Median age: "+data[3]);
+if (data[4]){
+selecteddiv.append("a").text(data[5]+" lockdown ").attr("href",data[6]);
+selecteddiv.append("em").text("on "+data[4]);
+}
+else {
+  selecteddiv.append("p").text(data[5]+" lockdown ")
+}
 // selecteddiv.append("p").text(data[5]);
 // selecteddiv.append("a").text("more info").attr("href",data[6]);
+}
 
+else if (data[5]==='Partial') {
+  var selecteddiv = d3.selectAll("#sample-metadata").append("div")
+ .classed("well", true).style("border-color", "gold");
+selecteddiv.append("h3").text(data[0].toUpperCase());
+selecteddiv.append("p").text("Population: "+nFormatter(data[1], 1));
+selecteddiv.append("p").text("Density (p/km"+'\xB2): '+data[2]);
+selecteddiv.append("p").text("Median age: "+data[3]);
+if (data[4]){
+selecteddiv.append("a").text(data[5]+" lockdown ").attr("href",data[6]);
+selecteddiv.append("em").text("on "+data[4]);
+}
+else {
+  selecteddiv.append("p").text(data[5]+" lockdown ")
+}
+}
+
+else if(data[5]==='No'){
+  var selecteddiv = d3.selectAll("#sample-metadata").append("div")
+  .classed("well", true).style("border-color", "yellowgreen");
+ selecteddiv.append("h3").text(data[0].toUpperCase());
+ selecteddiv.append("p").text("Population: "+nFormatter(data[1], 1));
+ selecteddiv.append("p").text("Density (p/km"+'\xB2): '+data[2]);
+ selecteddiv.append("p").text("Median age: "+data[3]);
+ if (data[4]){
+ selecteddiv.append("a").text(data[5]+" lockdown ").attr("href",data[6]);
+ selecteddiv.append("em").text(data[4]|| '');
+ }
+ else {
+   selecteddiv.append("p").text(data[5]+" lockdown ")
+ }
+}
   });
 }
 }
@@ -93,9 +152,9 @@ function buildChart(countries) {
 console.log(countries);
  d3.select("#bubble").selectAll("svg").remove();
   
- var margin = {top: 20, right: 40, bottom: 80, left: 100},
- width = 800 - margin.left - margin.right,
- height = 500 - margin.top - margin.bottom;
+ var margin = {top: 100, right: 100, bottom: 100, left: 100},
+ width = 900 - margin.left - margin.right,
+ height = 600 - margin.top - margin.bottom;
 
 // append the svg object to the body of the page
 var svg = d3.select("#bubble")
@@ -116,8 +175,8 @@ function filterCountries(d) {     if( countries.includes(d.country)){
 }
 }
 
-var chosenXAxis = "days_death";
-var chosenYAxis = "new_cases_perc";
+var chosenXAxis = "date";
+var chosenYAxis = "new_cases";
 
 // function used for updating x-scale var upon click on axis label
 function xScale(healthData, chosenXAxis) {
@@ -160,97 +219,45 @@ function renderAxes(newXScale, xAxis) {
   return xAxis;
 }
 
-
-  // function used for updating line group with a transition to
-// new lines
-
-//OLD RENDER
-
-// function renderLines(linesGroup, newXScale, chosenXaxis) {
-
-//   linesGroup.transition()
-//     .duration(1000)
-//     .attr("x", d => newXScale(d[chosenXAxis]));
-
-//   return linesGroup;
-// }
-
 // function used for updating y-scale var upon click on axis label
 function yScale(healthData, chosenYAxis) {
   // create scales
   var yLinearScale = d3.scaleLinear()
     .domain([d3.min(healthData, d => d[chosenYAxis]) * 0.8,
-      d3.max(healthData, d => d[chosenYAxis]) * 1.2
+      d3.max(healthData, d => d[chosenYAxis]) 
     ])
     .range([height, 0]);
+ 
 
   return yLinearScale;
 
 }
 
 function renderYAxes(newYScale, yAxis) {
-  var leftAxis = d3.axisLeft(newYScale);
+  console.log(yAxis)
+  if (chosenYAxis === 'new_cases_perc'){
+  var leftAxis = d3.axisLeft(newYScale).tickFormat("");
 
   yAxis.transition()
     .duration(1000)
     .call(leftAxis);
 
   return yAxis;
+  }
+  else{
+    var leftAxis = d3.axisLeft(newYScale);
+
+  yAxis.transition()
+    .duration(1000)
+    .call(leftAxis);
+
+  return yAxis;
+  }
 }
-
-// 
-
-// function renderYLines(linesGroup, newYScale, chosenYaxis) {
-
-//   linesGroup
-//      .data(sumstat)
-//      .enter()
-//      .append("path")
-//        .attr("fill", "none")
-//        .attr("stroke", function(d){ return color(d.key) })
-//        .attr("stroke-width", 1.5)
-//        .attr("d", function(d){
-//          console.log(d[chosenXAxis]);
-//          return d3.line()
-//            .x(function(d) { return xLinearScale(d[chosenXAxis]); })
-//            .y(function(d) { return newYScale(d[chosenYAxis]); })
-//            (d.values)
-//       //      .attr("fill", "none")
-//       //  .attr("stroke", function(d){ return color(d.key) })
-//       //  .attr("stroke-width", 1.5)
-//        })
-
-//   return linesGroup;
-// }
-
-
-
 
 
 d3.json(url).then(function(data) {
 
-
-
-//   function renderYLines(linesGroup, newYScale, chosenYaxis) {
-
-//    // console.log(linesGroup);
-
-//     linesGroup.transition()
-//     .duration(1000)
-//     .attr("d", function(d){
-//       //console.log(d[chosenXAxis]);
-//       return d3.line()
-//         .x(function(d) { return xLinearScale(d[chosenXAxis]); })
-//         .y(function(d) { return newYScale(d[chosenYAxis]); })
-//         (d.values)
-//    //      .attr("fill", "none")
-//    //  .attr("stroke", function(d){ return color(d.key) })
-//    //  .attr("stroke-width", 1.5)
-//     })
-
-
-//   return linesGroup;
-// }
 
 
   data.forEach(function(d) {
@@ -320,7 +327,7 @@ var color = d3.scaleOrdinal()
  .attr('class', 'legend');
 
 legend.append('rect')
- .attr('x', width - 50)
+ .attr('x', 230)
  .attr('y', function(d, i) {
    return i * 20+10;
  })
@@ -331,7 +338,7 @@ legend.append('rect')
  })
 
 legend.append('text')
- .attr('x', width - 10)
+ .attr('x', 250)
  .attr('y', function(d, i) {
    return (i * 20) + 21;
  })
@@ -348,6 +355,7 @@ function renderLines(linesGroup, newXScale, chosenXaxis) {
          .attr("d", function(d){
   
            return d3.line()
+           .curve(d3.curveBasis)
              .x(function(d) { return newXScale(d[chosenXAxis]); })
              .y(function(d) { return yLinearScale(d[chosenYAxis]); })
              (d.values)
@@ -375,12 +383,11 @@ console.log(chosenYAxis);
        .attr("d", function(d){
 
          return d3.line()
+         .curve(d3.curveBasis)
            .x(function(d) { return xLinearScale(d[chosenXAxis]); })
            .y(function(d) { return newYScale(d[chosenYAxis]); })
            (d.values)
-      //      .attr("fill", "none")
-      //  .attr("stroke", function(d){ return color(d.key) })
-      //  .attr("stroke-width", 1.5)
+
        })
 
 
@@ -399,14 +406,16 @@ chartGroup.selectAll(".line")
      .attr("d", function(d){
 
        return d3.line()
+        .curve(d3.curveBasis)
          .x(function(d) { return xLinearScale(d[chosenXAxis]); })
          .y(function(d) { return yLinearScale(d[chosenYAxis]); })
          (d.values)
+         
     //      .attr("fill", "none")
     //  .attr("stroke", function(d){ return color(d.key) })
     //  .attr("stroke-width", 1.5)
      })
-
+    
     // Create group for  2 x- axis labels
     var labelsGroup = chartGroup.append("g")
       .attr("transform", `translate(${width /2}, ${height + 20})`);
@@ -419,19 +428,19 @@ chartGroup.selectAll(".line")
       .text("Date");
   
     var deathLabel = labelsGroup.append("text")
-      .attr("x", 0)
+      .attr("x", 0-55)
       .attr("y", 40)
       .attr("value", "days_death") // value to grab for event listener
       .classed("inactive", true)
-      .text("Death");
+      .text("Days since first death");
 
 
     var lockLabel = labelsGroup.append("text")
-      .attr("x", 0)
+      .attr("x", 0-53)
       .attr("y", 60)
       .attr("value", "days_lock") // value to grab for event listener
       .classed("inactive", true)
-      .text("Lock");
+      .text("Days since lockdown");
 
 
 // Create group for  2 y- axis labels
@@ -442,22 +451,22 @@ var labelsGroupY = chartGroup.append("g")
 
 var new_casesLabel = labelsGroupY.append("text")
 //.attr("y", 0 - margin.left)?????????????????
-.attr("y",0-40)
+.attr("y",0-60)
 .attr("dy", "1em")
 
-.attr("x", 0 - (height / 2))
+.attr("x", 0 - (height / 2)-25)
 .attr("value", "new_cases") // value to grab for event listener
 .classed("active", true)
-.text("New Cases Total");
+.text("New cases");
 
 var new_cases_percLabel = labelsGroupY.append("text")
 //.attr("y", 0 - margin.left)
-.attr("y",0-60)
+.attr("y",0-90)
 .attr("dy", "1em")
-.attr("x", 0 - (height / 2))
+.attr("x", 0 - (height / 2)-68)
 .attr("value", "new_cases_perc") // value to grab for event listener
 .classed("inactive", true)
-.text("New cases Per Capita");
+.text("New cases per capita");
 
 
 labelsGroup.selectAll("text")

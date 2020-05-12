@@ -3,9 +3,14 @@ body {
   font: 16px Arial;
 }
 h2 {
-  color: darkgreen;
+  color: grey;
 }
-
+h3{
+  font: bold 17px Arial;
+}
+.well {
+  border-width: 2px;
+}
 .line {
   fill: none;
   stroke-width: 2px;
@@ -13,4 +18,9 @@ h2 {
 }
 #selDataset { 
   width:450px; }
+
+  em {
+    font: 16px Arial;
+  
+  }
 

@@ -16,23 +16,27 @@
   <script src = "https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
   <div class="container">
     <div class="row">
-      <div class="col-md-12 jumbotron text-center">
+      <div class="col-md-12 text-center">
         <h1>New COVID-19 cases by day scaled to population</h1>
-        <p>Use the interactive charts below to explore the dataset</p>
+        <p>Select countries you wish to comapare and the axis paramters. The graph shows
+          the number of new confirmed COVID-19 cases on a specific date. The number of cases can be shown
+          as total or per capita. The date can also be represented as a number of days passed since the 
+          first recorded COVID-19 death (negative numbers before that date) or a number of days passed since
+          the government imposed lockdown (for countries without lockdown median date is taken). Specifics of the lockdowns
+          can be found along with the country info (as links).
+        </p>
       </div>
     </div>
     
-      <div class="col-md-12">
+      <div class="col-md-9">
         
           <h4>SELECT Country:
        
             <select  id="selDataset" onchange="optionChanged(this)" multiple></select></h4>
 
           <!--ADD MULTIPLE LATER:   id="selDataset" onchange="optionChanged(this.value)" multiple-->
-        </div>
 
-        <div class="col-md-9">
-          <h3 class="panel-title">New COVID-19 Cases by Day</h3>
+          <h3 class="panel-title"></h3>
           <div id="bubble"></div>
         </div>
 
@@ -48,7 +52,10 @@
         </div>
 
         </div>
+      </div>
 
+    </div>
+  </div>
   <!-- <script src="https://cdn.plot.ly/plotly-1.31.2.min.js"></script> -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.5.0/d3.js"></script>
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
