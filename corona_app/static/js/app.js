@@ -115,7 +115,8 @@ console.log(selector);
     });
 
     // Use the first sample from the list to build the initial plots
-    const firstSample = symbolNames[0];
+   // const firstSample = symbolNames[0];
+   const firstSample = 'US';
   
     buildMetadata([firstSample]);
 
@@ -306,10 +307,6 @@ var sumstat = d3.nest() // nest function allows to group the calculation per lev
  .key(function(d) { return d.country;})
  .entries(data);
 
- // group the data: I want to draw one line per group
-// var sumstat = d3.nest() // nest function allows to group the calculation per level of a factor
-// .key(function(d) { return d.country+ " " + d.new_cases+" "+d.new_cases_all; })
-// .entries(data);
 
 
 
@@ -317,7 +314,7 @@ var sumstat = d3.nest() // nest function allows to group the calculation per lev
 var res = sumstat.map(function(d){ return d.key }) // list of group names
 var color = d3.scaleOrdinal()
  .domain(res)
- .range(['#e41a1c','#377eb8','#4daf4a','#984ea3','#ff7f00','#ffff33','#a65628','#f781bf','#999999'])
+ .range(['#f781bf','#377eb8','#FF7F50','#984ea3','#a65628','#999999'])
 
 
  var legend = svg.selectAll('.line')
@@ -329,7 +326,7 @@ var color = d3.scaleOrdinal()
 legend.append('rect')
  .attr('x', 230)
  .attr('y', function(d, i) {
-   return i * 20+10;
+   return i * 20+50;
  })
  .attr('width', 15)
  .attr('height', 15)
@@ -340,7 +337,7 @@ legend.append('rect')
 legend.append('text')
  .attr('x', 250)
  .attr('y', function(d, i) {
-   return (i * 20) + 21;
+   return (i * 20) + 61;
  })
  .text(function(d) {
    return d.key;
@@ -359,9 +356,7 @@ function renderLines(linesGroup, newXScale, chosenXaxis) {
              .x(function(d) { return newXScale(d[chosenXAxis]); })
              .y(function(d) { return yLinearScale(d[chosenYAxis]); })
              (d.values)
-        //      .attr("fill", "none")
-        //  .attr("stroke", function(d){ return color(d.key) })
-        //  .attr("stroke-width", 1.5)
+
          })
   
   
@@ -410,10 +405,7 @@ chartGroup.selectAll(".line")
          .x(function(d) { return xLinearScale(d[chosenXAxis]); })
          .y(function(d) { return yLinearScale(d[chosenYAxis]); })
          (d.values)
-         
-    //      .attr("fill", "none")
-    //  .attr("stroke", function(d){ return color(d.key) })
-    //  .attr("stroke-width", 1.5)
+  
      })
     
     // Create group for  2 x- axis labels
@@ -480,18 +472,16 @@ labelsGroup.selectAll("text")
   
           console.log(chosenXAxis)
   
-          // functions here found above csv import
+
           // updates x scale for new data
           xLinearScale = xScale(data, chosenXAxis);
   
           // updates x axis with transition
           xAxis = renderAxes(xLinearScale, xAxis);
   
-          // updates circles with new x values
+          // updates  new x values
           linesGroup = renderLines(linesGroup, xLinearScale, chosenXAxis);
-          //circlesText = renderText(circlesText, xLinearScale, chosenXAxis);
-          // // updates tooltips with new info
-          // circlesGroup = updateToolTip(chosenXAxis, circlesGroup);
+
   
           // changes classes to change bold text
           if (chosenXAxis === "date") {
