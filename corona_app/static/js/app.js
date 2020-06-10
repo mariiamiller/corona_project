@@ -262,17 +262,17 @@ d3.json(url).then(function(data) {
 
 
   data.forEach(function(d) {
-    d.date = parseTime(d.date);
-    d.new_cases_perc = +d.new_cases_perc;
-    d.new_cases = +d.new_cases;
-    d.days_death = +d.days_death;
-    d.days_lock = +d.days_lock;
-    countries.includes(d.country);
+    d.date = parseTime(d[1]);
+    d.new_cases_perc = +d[2];
+    d.new_cases = +d[3];
+    d.days_death = +d[4];
+    d.days_lock = +d[5];
+    d.include = countries.includes(d[0]);
 
 });
 
 console.log(data.filter(d=>d.country =='US'));
-data = data.filter(d=>countries.includes(d.country));
+data = data.filter(d=>d.include);
 
 var xLinearScale = xScale(data, chosenXAxis);
 var yLinearScale = yScale(data, chosenYAxis);
