@@ -1,5 +1,5 @@
 print("Hello world!")
-import os
+import os, sys
 print("Hello world!")
 import pandas as pd
 import numpy as np
@@ -25,7 +25,7 @@ app = Flask(__name__)
 
 
 #engine = create_engine("sqlite:///db/corona_new.db")
-engine = create_engine("sqlite:///db/corona0510.db")
+engine = create_engine("sqlite:///corona_app/db/corona0510.db")
 
 Base = automap_base()
 
@@ -97,4 +97,5 @@ def new_cases_all():
 
 
 if __name__ == "__main__":
-    app.run()
+    port = os.environ.get('PORT') or sys.argv[1]
+    app.run(port=port, host='0.0.0.0')
