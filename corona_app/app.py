@@ -25,7 +25,7 @@ app = Flask(__name__)
 
 
 #engine = create_engine("sqlite:///db/corona_new.db")
-engine = create_engine("sqlite:///db/corona0510.db")
+engine = create_engine("sqlite:///corona_app/db/corona0510.db")
 
 Base = automap_base()
 
